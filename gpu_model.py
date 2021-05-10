@@ -50,12 +50,12 @@ def log_sum_exp(vec):
     return max_score + t3
 
 
-class BiLSTM_CRF(nn.Module):
+class BiLSTM_CRF_gpu(nn.Module):
 
-    def __init__(self, filename, hidden_dim, sent_list, tag_list, mode, learning_rate=0.01, batch_size=1, dropout1=0, dropout2=0):
-        super(BiLSTM_CRF, self).__init__()
+    def __init__(self, filename, hidden_dim, sent_list, tag_list, mode, epoch=100, learning_rate=0.01, batch_size=1, dropout1=0, dropout2=0):
+        super(BiLSTM_CRF_gpu, self).__init__()
         word_to_idx, weights = read_embeddings(filename)
-        self.epoch_n = 100
+        self.epoch_n = epoch
         self.drop1 = dropout1
         self.drop2 = dropout2
         self.embedding_dim = len(weights[0])
@@ -513,6 +513,6 @@ def char2word(sent_list:list,tag_list:list)->(list,list):
 train_char, train_tag = read_char_tag('data/train.txt')
 train_word,train_chunk=char2word(train_char,train_tag)
 # __init__(self, filename, hidden_dim, sent_list, tag_list, mode, batch_size=1, dropout1=0, dropout2=0)
-test_model = BiLSTM_CRF('data/word_vec.txt', hidden_dim=50, sent_list=train_word, tag_list=train_chunk, mode="word",
+test_model = BiLSTM_CRF_gpu('data/word_vec.txt', hidden_dim=50, sent_list=train_word, tag_list=train_chunk, mode="word",
                         batch_size=64, learning_rate=0.1, dropout1=0, dropout2=0).cuda()
 test_model.fit(train_word, train_chunk)

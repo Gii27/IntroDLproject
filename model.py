@@ -42,8 +42,10 @@ def log_sum_exp(vec):
 
 class BiLSTM_CRF(nn.Module):
 
-    def __init__(self, filename, hidden_dim, sent_list, tag_list, mode, dropout1=0, dropout2=0):
+    def __init__(self, filename, hidden_dim, sent_list, tag_list, mode, epoch=100, learning_rate=0.01, dropout1=0, dropout2=0):
         super(BiLSTM_CRF, self).__init__()
+        self.epoch_n = epoch
+        self.learning_rate = learning_rate
         word_to_idx, weights = read_embeddings(filename)
         self.embedding_dim = len(weights[0])
         self.hidden_dim = hidden_dim
@@ -82,7 +84,7 @@ class BiLSTM_CRF(nn.Module):
         self.fit(sent_list, tag_list)
 
     def fit(self, sent_list: list, tag_list):
-        optimizer = optim.SGD(self.parameters(), lr=0.01, weight_decay=1e-4)
+        optimizer = optim.SGD(self.parameters(), lr=self.learning_rate, weight_decay=1e-4)
         # create figure of losses
         fig, ax = plt.subplots()
 
@@ -100,7 +102,7 @@ class BiLSTM_CRF(nn.Module):
         txt_log = open(log_path, mode='wt', buffering=1)
 
         # Make sure prepare_sequence from earlier in the LSTM section is loaded
-        for epoch in range(100):  # again, normally you would NOT do 300 epochs, it is toy data
+        for epoch in range(self.epoch_n):  # again, normally you would NOT do 300 epochs, it is toy data
             start = time.time()
             s = 0
             losses = []

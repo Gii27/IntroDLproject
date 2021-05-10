@@ -1,12 +1,18 @@
 import numpy as np
 from common import *
 from model import BiLSTM_CRF
+from gpu_model import BiLSTM_CRF_gpu
 
 class CharModel:
-    def __init__(self, train_char:list,train_tag:list, batch_size, dropout1=0, dropout2=0):
+    def __init__(self,train_char:list,train_tag:list, gpu, epoch=100, batch_size=1, lr=0.01, dropout1=0, dropout2=0):
         hidden_dim=100
-        self.model=BiLSTM_CRF('data/char_vec.txt',hidden_dim,train_char,train_tag,"char",
-                              batch_size, dropout1,dropout2)
+        if not gpu:
+            self.model=BiLSTM_CRF('data/char_vec.txt',hidden_dim=hidden_dim, sent_list=train_char, tag_list=train_tag, mode="char",
+                        epoch=epoch, learning_rate=lr, dropout1=dropout1, dropout2=dropout2)
+        else:
+            self.model = BiLSTM_CRF_gpu('data/char_vec.txt', hidden_dim=hidden_dim, sent_list=train_char,
+                                    tag_list=train_tag, mode="char",
+                                    epoch=epoch, batch_size=batch_size, learning_rate=lr, dropout1=dropout1, dropout2=dropout2)
 
     def predict(self, char_list: list) -> list:
         return self.model.predict(char_list)
